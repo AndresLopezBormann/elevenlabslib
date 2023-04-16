@@ -117,6 +117,24 @@ class ElevenLabsVoice:
 
 
         return response.content
+    
+
+    def generate_and_download_audio(self, filename:str, prompt:str, stability:Optional[float]=None, similarity_boost:Optional[float]=None, ) -> bytes:
+        """
+            Downloads an audio file in the MP3 format using the prompt text, stability and similarity boost as parameters.
+        Args:
+            prompt: A string containing the text prompt to be used for generating the audio.
+            stability: An optional float representing the stability of the generated audio. Default is None.
+            similarity_boost: An optional float representing the similarity boost of the generated audio. Default is None.
+            filename: An optional string representing the filename to save the downloaded audio file. Default is "Audio.mp3".
+        Returns:
+            response.content(dict): A dictionary containing the payload for the API call.
+        """
+        payload = self._generate_payload(prompt, stability, similarity_boost)
+        response = _api_json("/text-to-speech/" + self._voiceID + "/stream", self._linkedUser.headers, jsonData=payload)
+        save_bytes_to_file_object(fp=filename, audioData=response.content, outputFormat="mp3")
+
+        return response.content
 
     def generate_and_play_audio(self, prompt:str, playInBackground:bool, portaudioDeviceID:Optional[int] = None,
                                 stability:Optional[float]=None, similarity_boost:Optional[float]=None,
